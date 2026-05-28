@@ -18,7 +18,7 @@ async function bootstrap() {
     // Run worker in the same process for free-tier deployments (e.g. Render)
     if (process.env.RUN_WORKER === 'true') {
       console.log('[server] RUN_WORKER is true. Starting background worker in-process...');
-      require('./workers/generationWorker');
+      await import('./workers/generationWorker');
     }
 
     server.listen(PORT, () => {
