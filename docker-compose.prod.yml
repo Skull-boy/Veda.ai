@@ -1,0 +1,63 @@
+version: '3.9'
+
+services:
+  mongodb:
+    image: mongo:7
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: vedaai
+    networks:
+      - vedaai_net
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - vedaai_net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - '4000:4000'
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/vedaai
+      - REDIS_URL=redis://redis:6379
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - FRONTEND_URL=${FRONTEND_URL}
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - vedaai_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - '3000:3000'
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
+    depends_on:
+      - backend
+    networks:
+      - vedaai_net
+
+volumes:
+  mongo_data:
+  redis_data:
+
+networks:
+  vedaai_net:
+    driver: bridge
