@@ -1,15 +1,14 @@
 import { Queue } from 'bullmq';
 
-const connection = {
-  host: new URL(process.env.REDIS_URL ?? 'redis://localhost:6379').hostname,
-  port: parseInt(
-    new URL(process.env.REDIS_URL ?? 'redis://localhost:6379').port || '6379',
-    10
-  ),
-};
+import IORedis from 'ioredis';
+
+const connection = new IORedis(process.env.REDIS_URL ?? 'redis://localhost:6379', {
+  maxRetriesPerRequest: null,
+});
+
 
 export const generationQueue = new Queue('generation', {
-  connection,
+  connection: connection as any,
   defaultJobOptions: {
     attempts: 3,
     backoff: {

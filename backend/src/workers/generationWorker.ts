@@ -7,13 +7,11 @@ import { broadcastToRoom } from '../config/websocket';
 import type { GenerationJobData } from '../services/queue';
 import type { CreateAssignmentDTO } from '../types';
 
-const connection = {
-  host: new URL(process.env.REDIS_URL ?? 'redis://localhost:6379').hostname,
-  port: parseInt(
-    new URL(process.env.REDIS_URL ?? 'redis://localhost:6379').port || '6379',
-    10
-  ),
-};
+import IORedis from 'ioredis';
+
+const connection = new IORedis(process.env.REDIS_URL ?? 'redis://localhost:6379', {
+  maxRetriesPerRequest: null,
+});
 
 async function processGenerationJob(job: Job<GenerationJobData>): Promise<void> {
   const { assignmentId } = job.data;
@@ -85,7 +83,7 @@ async function startWorker(): Promise<void> {
     'generation',
     processGenerationJob,
     {
-      connection,
+      connection: connection as any,
       concurrency: 3,
     }
   );
