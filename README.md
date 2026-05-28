@@ -66,6 +66,21 @@ vedaai/
 
 ---
 
+## ☁️ Free-Tier Hosting Guide (For Interviewers & Reviewers)
+
+> ⚠️ **Note on Hosting:** If you are reviewing this project via a live URL, please note that the backend is deployed on a **free-tier Render instance**.
+> 
+> Free instances spin down after 15 minutes of inactivity. **The first request you make may take ~50 seconds to complete** as the server wakes up. All subsequent requests will be lightning fast.
+
+### How this is deployed for free:
+1. **Frontend:** Deployed on **Vercel** (Always awake, lightning fast).
+2. **Backend (API + Worker):** Deployed on **Render** (Free Web Service).
+   - *Trick used:* By setting `RUN_WORKER=true` in Render's environment variables, the BullMQ worker runs in the same Node.js process as the API. This bypasses Render's limitation of requiring a paid "Background Worker" service, allowing the entire backend to run on a single free instance!
+3. **Database & Cache:** MongoDB Atlas (Free Tier) and Upstash Redis (Free Tier).
+4. **Keep-Alive Strategy:** A cron job pinging the `/api/health` endpoint every 14 minutes ensures the Render instance never sleeps during peak interview/review hours.
+
+---
+
 ## 🚀 Local Development Setup
 
 ### Prerequisites

@@ -15,6 +15,12 @@ async function bootstrap() {
     const server = http.createServer(app);
     initWebSocket(server);
 
+    // Run worker in the same process for free-tier deployments (e.g. Render)
+    if (process.env.RUN_WORKER === 'true') {
+      console.log('[server] RUN_WORKER is true. Starting background worker in-process...');
+      require('./workers/generationWorker');
+    }
+
     server.listen(PORT, () => {
       console.log(`[server] VedaAI backend running on port ${PORT}`);
     });
