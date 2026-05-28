@@ -32,6 +32,22 @@ export default function AssignmentResultPage() {
     }
   }, [assignmentId, currentAssignmentId, setCurrentAssignmentId, setJobStatus, setGeneratedPaper]);
 
+  // Polling fallback just in case the WebSocket disconnects during generation
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (jobStatus === 'pending' || jobStatus === 'processing') {
+      interval = setInterval(() => {
+        api.getAssignment(assignmentId).then((a) => {
+          if (a.status === 'completed' || a.status === 'failed') {
+            setJobStatus(a.status);
+            if (a.generatedPaper) setGeneratedPaper(a.generatedPaper);
+          }
+        }).catch(() => {});
+      }, 3000); // Check every 3 seconds
+    }
+    return () => clearInterval(interval);
+  }, [assignmentId, jobStatus, setJobStatus, setGeneratedPaper]);
+
   const handleRegenerate = async () => {
     try {
       setIsRegenerating(true);
