@@ -1,4 +1,4 @@
-# VedaAI — Assessment Creator
+# VedaAI 
 
 A production-ready AI-powered assessment creation platform for educators, built exactly to the VedaAI specifications. Teachers describe what they need, and VedaAI generates structured, exam-quality question papers using Google Gemini.
 
