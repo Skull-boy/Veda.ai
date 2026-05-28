@@ -91,6 +91,7 @@ export async function generateQuestionPaper(
       temperature: 0.7,
       topP: 0.9,
       maxOutputTokens: 8192,
+      responseMimeType: 'application/json',
     },
   });
 
